@@ -1,8 +1,16 @@
+import { Role } from '@prisma/client';
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 const PUBLIC_PATHS = ['/', '/login', '/reset-password'];
 const AUTH_PATHS = ['/login', '/reset-password'];
+
+const ROLE_PREFIX: Record<string, Role> = {
+  '/admin': Role.ADMIN,
+  '/teacher': Role.TEACHER,
+  '/student': Role.STUDENT,
+  '/parent': Role.PARENT,
+};
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -56,5 +64,4 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|logo.png).*)'],
-  runtime: 'nodejs',
 };

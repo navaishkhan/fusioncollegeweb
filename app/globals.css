@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
-/* Google fonts loaded via next/font in layout.tsx */
+/* ═══════════════════════════════════════════════════════════
+   FUSION COLLEGE — Claymorphism Design System
+   Brand Colors: Navy #3D4193 · Red #E8001D · Cyan #00B4D8
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ─── TOKENS ──────────────────────────────────────────────── */
 :root {
@@ -129,7 +134,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--bg);
   color: var(--text);
   overflow-x: hidden;
