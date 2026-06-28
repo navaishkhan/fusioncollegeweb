@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx prisma generate --schema=lms\\prisma\\schema.prisma && vite build",
     "preview": "vite preview",
     "legacy:dev": "vite",
     "legacy:build": "vite build"
