@@ -342,7 +342,7 @@ const Navbar = ({ theme, toggleTheme }) => {
           <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
         ))}
         <a
-          href="https://lms.fusioncollege.edu.pk"
+          href="https://fusioncollegenarowal-git-main-aclockwobe.vercel.app"
           target="_blank" rel="noreferrer"
           className="nav-lms"
         >LMS Portal ↗</a>
@@ -556,7 +556,7 @@ export default function App() {
           </p>
           <div className="hero-ctas">
             <a href="#admissions" className="btn btn-solid">Apply Now 2026</a>
-            <a href="https://lms.fusioncollege.edu.pk" target="_blank" rel="noreferrer" className="btn btn-red">Student LMS ↗</a>
+            <a href="https://fusioncollegenarowal-git-main-aclockwobe.vercel.app" target="_blank" rel="noreferrer" className="btn btn-red">Student LMS ↗</a>
             <a href="#programs" className="btn btn-outline">View Programs</a>
           </div>
         </div>
