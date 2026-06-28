@@ -38,9 +38,11 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md bg-[#16192b]/80 border border-[#2b3052] rounded-2xl p-8 backdrop-blur-xl shadow-2xl relative z-10">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-[#1e233d] flex items-center justify-center mb-3 shadow-lg border border-[#2b3052]">
-            <span className="text-2xl font-black text-cyan-400">F</span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Fusion College Logo"
+            className="w-16 h-16 rounded-full mb-3 shadow-lg border border-[#2b3052] object-contain bg-white"
+          />
           <h2 className="text-2xl font-bold text-white tracking-tight">FUSION COLLEGE LMS</h2>
           <p className="text-zinc-400 text-sm mt-1">Sign in to your portal</p>
         </div>

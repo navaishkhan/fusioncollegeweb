@@ -41,9 +41,11 @@ export default async function DashboardLayout({ children }) {
       {/* Sidebar */}
       <aside className="w-64 border-r border-[#1e233d] bg-[#0d0f1a] hidden md:flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-[#1e233d] gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#1e233d] flex items-center justify-center border border-cyan-500/30">
-            <span className="text-sm font-black text-cyan-400">F</span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Fusion College Logo"
+            className="w-8 h-8 rounded-full border border-cyan-500/30 object-contain bg-white"
+          />
           <span className="font-bold tracking-tight text-white">FUSION LMS</span>
         </div>
 
@@ -76,9 +78,11 @@ export default async function DashboardLayout({ children }) {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 border-b border-[#1e233d] bg-[#0d0f1a]/50 backdrop-blur px-6 flex items-center justify-between md:justify-end">
           <div className="md:hidden flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#1e233d] flex items-center justify-center">
-              <span className="text-sm font-black text-cyan-400">F</span>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Fusion College Logo"
+              className="w-8 h-8 rounded-full object-contain bg-white"
+            />
             <span className="font-bold text-white text-sm">FUSION LMS</span>
           </div>
 
