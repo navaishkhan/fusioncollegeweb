@@ -1,0 +1,213 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LEAVE
+  LATE
+}
+
+model User {
+  id        String     @id @default(uuid())
+  authId    String     @unique // Maps to Supabase auth.users.id
+  email     String     @unique
+  role      UserRole   @default(STUDENT)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Profiles
+  admin     Admin?
+  teacher   Teacher?
+  student   Student?
+  parent    Parent?
+}
+
+model Admin {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+}
+
+model Teacher {
+  id            String         @id @default(uuid())
+  userId        String         @unique
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  phone         String?
+  qualification String?
+  subjects      ClassSubject[]
+}
+
+model Student {
+  id          String          @id @default(uuid())
+  userId      String          @unique
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  rollNumber  String          @unique
+  fatherName  String
+  classId     String
+  class       Class           @relation(fields: [classId], references: [id])
+  parents     ParentStudent[]
+  submissions Submission[]
+  attendance  Attendance[]
+  examResults ExamResult[]
+}
+
+model Parent {
+  id       String          @id @default(uuid())
+  userId   String          @unique
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name     String
+  phone    String
+  children ParentStudent[]
+}
+
+// Join table for Parent-Student relationship (M:N)
+model ParentStudent {
+  parentId  String
+  studentId String
+  parent    Parent  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@id([parentId, studentId])
+}
+
+model Class {
+  id         String         @id @default(uuid())
+  name       String         @unique // e.g., "F.Sc Pre-Medical Part I"
+  academicYr String         // e.g., "2026-2027"
+  students   Student[]
+  subjects   ClassSubject[]
+}
+
+model Subject {
+  id            String         @id @default(uuid())
+  name          String         @unique // e.g., "Biology"
+  classSubjects ClassSubject[]
+}
+
+// Intersecting Class, Subject, and Assigned Teacher
+model ClassSubject {
+  id        String     @id @default(uuid())
+  classId   String
+  subjectId String
+  teacherId String
+  class     Class      @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher   Teacher    @relation(fields: [teacherId], references: [id])
+  materials Material[]
+  exams     Exam[]
+  lectures  Lecture[]
+
+  @@unique([classId, subjectId])
+}
+
+model Material {
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  fileUrl        String
+  classSubjectId String
+  classSubject   ClassSubject @relation(fields: [classSubjectId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+}
+
+model Assignment {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  deadline    DateTime
+  fileUrl     String?
+  submissions Submission[]
+  createdAt   DateTime     @default(now())
+}
+
+model Submission {
+  id           String     @id @default(uuid())
+  assignmentId String
+  studentId    String
+  fileUrl      String
+  grade        String?
+  remarks      String?
+  status       String     @default("SUBMITTED") // SUBMITTED, GRADED, LATE
+  submittedAt  DateTime   @default(now())
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student      Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+}
+
+model Lecture {
+  id             String       @id @default(uuid())
+  date           DateTime     @default(now())
+  topic          String
+  classSubjectId String
+  classSubject   ClassSubject @relation(fields: [classSubjectId], references: [id], onDelete: Cascade)
+  attendance     Attendance[]
+}
+
+model Attendance {
+  id        String           @id @default(uuid())
+  lectureId String
+  studentId String
+  status    AttendanceStatus @default(PRESENT)
+  lecture   Lecture          @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([lectureId, studentId])
+}
+
+model Exam {
+  id             String       @id @default(uuid())
+  title          String       // e.g. "Monthly Test Oct"
+  date           DateTime
+  totalMarks     Int
+  classSubjectId String
+  classSubject   ClassSubject @relation(fields: [classSubjectId], references: [id], onDelete: Cascade)
+  results        ExamResult[]
+}
+
+model ExamResult {
+  id        String  @id @default(uuid())
+  examId    String
+  studentId String
+  marksObt  Decimal @db.Decimal(5, 2)
+  status    String  @default("PASSED")
+  exam      Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, studentId])
+}
+
+model ContactEnquiry {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  phone     String
+  message   String
+  status    String   @default("UNREAD") // UNREAD, REVIEWED, ARCHIVED
+  createdAt DateTime @default(now())
+}

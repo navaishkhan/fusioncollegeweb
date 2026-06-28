@@ -304,7 +304,7 @@ const Cursor = () => {
 };
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
-const Navbar = ({ theme, toggleTheme }) => {
+const Navbar = ({ theme, toggleTheme, lmsUrl }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
@@ -342,8 +342,9 @@ const Navbar = ({ theme, toggleTheme }) => {
           <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
         ))}
         <a
-          href="https://lms.fusioncollege.edu.pk"
-          target="_blank" rel="noreferrer"
+          href={lmsUrl}
+          target="_blank"
+          rel="noreferrer"
           className="nav-lms"
         >LMS Portal ↗</a>
         <button
@@ -445,6 +446,11 @@ export default function App() {
 
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
+  const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const lmsUrl = isLocal 
+    ? 'http://localhost:3000' 
+    : 'https://fusioncollegenarowal-lms.vercel.app';
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -525,9 +531,44 @@ export default function App() {
     },
   ];
 
-  const handleFormSubmit = e => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    alert('Message sent! We will contact you soon at +92 304 3113555');
+    const form = e.target;
+    const name = form.fullName.value;
+    const phone = form.phone.value;
+    const email = form.email.value;
+    const program = form.program.value;
+    const messageText = form.message.value;
+
+    const fullMessage = program ? `[Program: ${program}] ${messageText}` : messageText;
+
+    const payload = {
+      name,
+      phone,
+      email: email || null,
+      message: fullMessage,
+    };
+
+    try {
+      const response = await fetch(`${lmsUrl}/api/enquiry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        alert('Thank you! Your enquiry has been submitted. We will contact you soon.');
+        form.reset();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Failed to send enquiry: ${errorData.error || 'Server error'}`);
+      }
+    } catch (err) {
+      console.error('Enquiry error:', err);
+      alert('An error occurred. Please try again or call us directly at +92 304 3113555.');
+    }
   };
 
   return (
@@ -538,7 +579,7 @@ export default function App() {
         <div className="orb orb-3" />
       </div>
       <Cursor />
-      <Navbar theme={theme} toggleTheme={toggleTheme} />
+      <Navbar theme={theme} toggleTheme={toggleTheme} lmsUrl={lmsUrl} />
 
       {/* ══════════════════ HERO ══════════════════ */}
       <section className="hero section-shell section-shell--hero">
@@ -556,7 +597,7 @@ export default function App() {
           </p>
           <div className="hero-ctas">
             <a href="#admissions" className="btn btn-solid">Apply Now 2026</a>
-            <a href="https://lms.fusioncollege.edu.pk" target="_blank" rel="noreferrer" className="btn btn-red">Student LMS ↗</a>
+            <a href={lmsUrl} target="_blank" rel="noreferrer" className="btn btn-red">Student LMS ↗</a>
             <a href="#programs" className="btn btn-outline">View Programs</a>
           </div>
         </div>
@@ -764,12 +805,12 @@ export default function App() {
             <div className="lms-cta-box reveal">
               <div className="lms-cta-circle">LMS</div>
               <a
-                href="https://lms.fusioncollege.edu.pk"
+                href={lmsUrl}
                 target="_blank" rel="noreferrer"
                 className="btn btn-cyan"
                 style={{marginBottom:'1.2rem'}}
               >Login to Portal ↗</a>
-              <div className="lms-domain">lms.fusioncollege.edu.pk</div>
+              <div className="lms-domain">lms.fusioncollegenarowal-lms.vercel.app</div>
             </div>
           </div>
       </SectionShell>
@@ -820,20 +861,20 @@ export default function App() {
               <div className="form-row">
                 <div className="form-field">
                   <label>Full Name</label>
-                  <input type="text" placeholder="Your full name" required />
+                  <input type="text" name="fullName" placeholder="Your full name" required />
                 </div>
                 <div className="form-field">
                   <label>Phone / WhatsApp</label>
-                  <input type="tel" placeholder="+92 300 0000000" required />
+                  <input type="tel" name="phone" placeholder="+92 300 0000000" required />
                 </div>
               </div>
               <div className="form-field">
                 <label>Email Address</label>
-                <input type="email" placeholder="your@email.com" />
+                <input type="email" name="email" placeholder="your@email.com" />
               </div>
               <div className="form-field">
                 <label>Program of Interest</label>
-                <select>
+                <select name="program">
                   <option value="">Select a program</option>
                   <option>F.Sc Pre-Medical</option>
                   <option>F.Sc Pre-Engineering</option>
@@ -843,7 +884,7 @@ export default function App() {
               </div>
               <div className="form-field">
                 <label>Message</label>
-                <textarea rows="4" placeholder="Your question or message..." />
+                <textarea name="message" rows="4" placeholder="Your question or message..." required />
               </div>
               <button type="submit" className="btn btn-solid w-full">Send Message</button>
             </form>
@@ -884,7 +925,7 @@ export default function App() {
           <div className="footer-links">
             <h4>Resources</h4>
             <ul>
-              <li><a href="https://lms.fusioncollege.edu.pk" target="_blank" rel="noreferrer">Student LMS ↗</a></li>
+              <li><a href={lmsUrl} target="_blank" rel="noreferrer">Student LMS ↗</a></li>
               <li><a href="https://www.fusioncollege.edu.pk" target="_blank" rel="noreferrer">Main Website ↗</a></li>
               <li><a href="#contact">Contact Us</a></li>
             </ul>
