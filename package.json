@@ -3,15 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "legacy:dev": "vite",
+    "legacy:build": "vite build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
