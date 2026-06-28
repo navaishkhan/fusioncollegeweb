@@ -449,7 +449,7 @@ export default function App() {
   const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   const lmsUrl = isLocal 
     ? 'http://localhost:3000' 
-    : 'https://fusioncollegenarowal-lms.vercel.app';
+    : 'https://fusioncollegewebfinal.vercel.app/login';
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -810,7 +810,7 @@ export default function App() {
                 className="btn btn-cyan"
                 style={{marginBottom:'1.2rem'}}
               >Login to Portal ↗</a>
-              <div className="lms-domain">lms.fusioncollegenarowal-lms.vercel.app</div>
+              <div className="lms-domain">fusioncollegewebfinal.vercel.app</div>
             </div>
           </div>
       </SectionShell>
