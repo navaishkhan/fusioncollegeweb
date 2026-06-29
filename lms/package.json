@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate && npm run seed",
+    "postinstall": "prisma generate",
     "create-admin": "node scripts/create-default-admin.js",
     "seed": "node prisma/seed.js"
   },
@@ -16,6 +16,7 @@
     "@prisma/client": "^6.8.2",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "2.44.4",
+    "dotenv": "^17.4.2",
     "lucide-react": "^0.511.0",
     "next": "16.2.9",
     "prisma": "^6.8.2",
