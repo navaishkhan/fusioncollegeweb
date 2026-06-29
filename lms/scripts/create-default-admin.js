@@ -1,5 +1,7 @@
 // lms/scripts/create-default-admin.js
-import { createClient } from "@supabase/supabase-js";
+// This script creates a default admin user using Supabase Admin REST API and Prisma.
+// Run with: npm run create-admin
+
 import { PrismaClient } from "@prisma/client";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -10,50 +12,47 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-const prisma = new PrismaClient();
-
 const ADMIN_EMAIL = "admin@fusioncollege.com";
 const ADMIN_PASSWORD = "AdminPass123!";
 
-async function main() {
-  // Check if admin already exists in Supabase Auth
-  const { data: existingUser, error: getError } = await supabase.auth.admin.getUserByEmail(ADMIN_EMAIL);
-  if (existingUser) {
-    console.log("Admin already exists:\nID:", existingUser.id);
-    return;
-  }
-
-  // Create user via Supabase Admin API
-  const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
-    email: ADMIN_EMAIL,
-    password: ADMIN_PASSWORD,
-    email_confirm: true,
-  });
-  if (createError) {
-    console.error("Supabase createUser error:", createError);
-    process.exit(1);
-  }
-
-  // Insert admin role into Prisma DB (User table assumed to have role field)
-  await prisma.user.upsert({
-    where: { id: newUser.id },
-    update: { role: "ADMIN" },
-    create: {
-      id: newUser.id,
-      email: ADMIN_EMAIL,
-      role: "ADMIN",
+async function createSupabaseUser() {
+  const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": supabaseServiceKey,
+      "Authorization": `Bearer ${supabaseServiceKey}`,
     },
+    body: JSON.stringify({
+      email: ADMIN_EMAIL,
+      password: ADMIN_PASSWORD,
+      email_confirm: true,
+    }),
   });
 
-  console.log("✅ Default admin created\nID:", newUser.id, "\nPassword:", ADMIN_PASSWORD);
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Supabase createUser failed: ${response.status} ${err}`);
+  }
+  const data = await response.json();
+      },
+    });
+    // Create Admin record linked to User
+    await prisma.admin.create({
+      data: {
+        id: supaUser.id,
+        userId: supaUser.id,
+        name: "Default Admin",
+        email: ADMIN_EMAIL,
+      },
+    });
+    console.log("✅ Default admin created\nID:", supaUser.id, "\nPassword:", ADMIN_PASSWORD);
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
