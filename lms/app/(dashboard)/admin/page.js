@@ -191,7 +191,7 @@ export default async function AdminDashboard() {
       {/* Quick Actions */}
       <div className="space-y-6">
         <h2 className="text-lg font-bold text-white tracking-tight">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <Link href="/admin/students" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
             Manage Students
           </Link>
@@ -203,6 +203,9 @@ export default async function AdminDashboard() {
           </Link>
           <Link href="/admin/subjects" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
             Manage Subjects
+          </Link>
+          <Link href="/admin/notifications" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
+            Notifications
           </Link>
         </div>
       </div>

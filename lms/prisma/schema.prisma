@@ -1,7 +1,6 @@
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -62,18 +61,20 @@ model Teacher {
 }
 
 model Student {
-  id          String          @id @default(uuid())
-  userId      String          @unique
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String
-  rollNumber  String          @unique
-  fatherName  String
-  classId     String
-  class       Class           @relation(fields: [classId], references: [id])
-  parents     ParentStudent[]
-  submissions Submission[]
-  attendance  Attendance[]
-  examResults ExamResult[]
+  id                      String                   @id @default(uuid())
+  userId                  String                   @unique
+  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                    String
+  rollNumber              String                   @unique
+  fatherName              String
+  phone                   String?
+  classId                 String
+  class                   Class                    @relation(fields: [classId], references: [id])
+  parents                 ParentStudent[]
+  submissions             Submission[]
+  attendance              Attendance[]
+  examResults             ExamResult[]
+  attendanceNotifications AttendanceNotification[]
 }
 
 model Parent {
@@ -210,4 +211,17 @@ model ContactEnquiry {
   message   String
   status    String   @default("UNREAD") // UNREAD, REVIEWED, ARCHIVED
   createdAt DateTime @default(now())
+}
+
+model AttendanceNotification {
+  id           String   @id @default(uuid())
+  studentId    String
+  lectureId    String
+  status       String   @default("PENDING") // PENDING, SENT, FAILED
+  sentAt       DateTime?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, lectureId])
 }
