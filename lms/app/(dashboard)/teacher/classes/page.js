@@ -123,11 +123,8 @@ export default async function TeacherClassesPage() {
                 <Link href={`/teacher/classes/${cs.id}/attendance`} className="text-xs px-3 py-2 bg-[#1e233d] border border-[#2b3052] rounded text-cyan-400 hover:bg-cyan-950/20 transition-colors text-center">
                   Take Attendance
                 </Link>
-                <Link href={`/teacher/classes/${cs.id}/assignments`} className="text-xs px-3 py-2 bg-[#1e233d] border border-[#2b3052] rounded text-cyan-400 hover:bg-cyan-950/20 transition-colors text-center">
-                  Manage Assignments
-                </Link>
-                <Link href={`/teacher/classes/${cs.id}/materials`} className="text-xs px-3 py-2 bg-[#1e233d] border border-[#2b3052] rounded text-cyan-400 hover:bg-cyan-950/20 transition-colors text-center">
-                  Upload Materials
+                <Link href={`/teacher/assignments`} className="text-xs px-3 py-2 bg-[#1e233d] border border-[#2b3052] rounded text-cyan-400 hover:bg-cyan-950/20 transition-colors text-center">
+                  View Assignments
                 </Link>
               </div>
             </div>
