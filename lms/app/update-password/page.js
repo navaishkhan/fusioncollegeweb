@@ -1,33 +1,59 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
+export default function UpdatePasswordPage() {
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+  const router = useRouter();
   const supabase = createClient();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    // Check if user has a valid recovery token in the URL
+    const hash = window.location.hash;
+    if (!hash.includes('type=recovery')) {
+      router.push('/login');
+    }
+  }, [router]);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: password,
     });
 
-    if (signInError) {
-      setError(signInError.message);
+    if (updateError) {
+      setError(updateError.message);
       setLoading(false);
       return;
     }
 
-    // Redirect to home (which will route to role dashboard via middleware)
-    window.location.href = '/';
+    setMessage('Password updated successfully! Redirecting to login...');
+    setLoading(false);
+
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
   };
 
   return (
@@ -43,8 +69,8 @@ export default function LoginPage() {
             alt="Fusion College Logo"
             className="w-16 h-16 rounded-full mb-3 shadow-lg border border-[#2b3052] object-contain bg-white"
           />
-          <h2 className="text-2xl font-bold text-white tracking-tight">FUSION COLLEGE LMS</h2>
-          <p className="text-zinc-400 text-sm mt-1">Sign in to your portal</p>
+          <h2 className="text-2xl font-bold text-white tracking-tight">Update Password</h2>
+          <p className="text-zinc-400 text-sm mt-1">Enter your new password</p>
         </div>
 
         {error && (
@@ -53,27 +79,35 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">Email Address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="w-full bg-[#0d0f1a] border border-[#2b3052] rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 transition-colors"
-            />
+        {message && (
+          <div className="mb-6 p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm">
+            {message}
           </div>
+        )}
 
+        <form onSubmit={handleUpdatePassword} className="space-y-6">
           <div>
-            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">Password</label>
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">New Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
+              minLength={6}
+              className="w-full bg-[#0d0f1a] border border-[#2b3052] rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              minLength={6}
               className="w-full bg-[#0d0f1a] border border-[#2b3052] rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 transition-colors"
             />
           </div>
@@ -86,18 +120,18 @@ export default function LoginPage() {
             {loading ? (
               <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              'Sign In'
+              'Update Password'
             )}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <a
-            href="/reset-password"
-            className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+          <button
+            onClick={() => router.push('/login')}
+            className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
           >
-            Forgot password?
-          </a>
+            Back to Login
+          </button>
         </div>
       </div>
     </div>

@@ -2,32 +2,33 @@
 
 import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import Link from 'next/link';
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
   const supabase = createClient();
 
-  const handleLogin = async (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setMessage(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback`,
     });
 
-    if (signInError) {
-      setError(signInError.message);
+    if (resetError) {
+      setError(resetError.message);
       setLoading(false);
       return;
     }
 
-    // Redirect to home (which will route to role dashboard via middleware)
-    window.location.href = '/';
+    setMessage('Password reset email sent! Check your inbox.');
+    setLoading(false);
   };
 
   return (
@@ -43,8 +44,8 @@ export default function LoginPage() {
             alt="Fusion College Logo"
             className="w-16 h-16 rounded-full mb-3 shadow-lg border border-[#2b3052] object-contain bg-white"
           />
-          <h2 className="text-2xl font-bold text-white tracking-tight">FUSION COLLEGE LMS</h2>
-          <p className="text-zinc-400 text-sm mt-1">Sign in to your portal</p>
+          <h2 className="text-2xl font-bold text-white tracking-tight">Reset Password</h2>
+          <p className="text-zinc-400 text-sm mt-1">Enter your email to reset password</p>
         </div>
 
         {error && (
@@ -53,7 +54,13 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        {message && (
+          <div className="mb-6 p-4 bg-emerald-950/40 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm">
+            {message}
+          </div>
+        )}
+
+        <form onSubmit={handleResetPassword} className="space-y-6">
           <div>
             <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">Email Address</label>
             <input
@@ -61,18 +68,6 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              required
-              className="w-full bg-[#0d0f1a] border border-[#2b3052] rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 transition-colors"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
               required
               className="w-full bg-[#0d0f1a] border border-[#2b3052] rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 transition-colors"
             />
@@ -86,18 +81,18 @@ export default function LoginPage() {
             {loading ? (
               <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              'Sign In'
+              'Send Reset Link'
             )}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <a
-            href="/reset-password"
+          <Link
+            href="/login"
             className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
           >
-            Forgot password?
-          </a>
+            Back to Login
+          </Link>
         </div>
       </div>
     </div>
