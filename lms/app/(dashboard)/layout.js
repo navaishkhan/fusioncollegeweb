@@ -22,8 +22,76 @@ export default async function DashboardLayout({ children }) {
         parent: true,
       },
     });
+
+    // Auto-create user profile if it doesn't exist
+    if (!dbUser) {
+      // Determine role from user metadata or default to STUDENT
+      const userRole = user.user_metadata?.role || 'STUDENT';
+      
+      dbUser = await prisma.user.create({
+        data: {
+          id: user.id,
+          authId: user.id,
+          email: user.email,
+          role: userRole.toUpperCase(),
+          status: 'ACTIVE',
+        },
+      });
+
+      // Create role-specific profile based on role
+      switch (userRole.toUpperCase()) {
+        case 'ADMIN':
+          await prisma.admin.create({
+            data: {
+              id: user.id,
+              userId: user.id,
+              name: user.email?.split('@')[0] || 'Admin',
+            },
+          });
+          break;
+        case 'TEACHER':
+          await prisma.teacher.create({
+            data: {
+              id: user.id,
+              userId: user.id,
+              name: user.email?.split('@')[0] || 'Teacher',
+            },
+          });
+          break;
+        case 'STUDENT':
+          await prisma.student.create({
+            data: {
+              id: user.id,
+              userId: user.id,
+              name: user.email?.split('@')[0] || 'Student',
+              rollNumber: 'TEMP-' + user.id.slice(0, 8),
+            },
+          });
+          break;
+        case 'PARENT':
+          await prisma.parent.create({
+            data: {
+              id: user.id,
+              userId: user.id,
+              name: user.email?.split('@')[0] || 'Parent',
+            },
+          });
+          break;
+      }
+
+      // Re-fetch with includes
+      dbUser = await prisma.user.findUnique({
+        where: { authId: user.id },
+        include: {
+          student: true,
+          teacher: true,
+          admin: true,
+          parent: true,
+        },
+      });
+    }
   } catch (err) {
-    console.error('Error fetching user profile:', err);
+    console.error('Error fetching/creating user profile:', err);
   }
 
   const name = dbUser?.student?.name || dbUser?.teacher?.name || dbUser?.admin?.name || dbUser?.parent?.name || user.email;

@@ -22,7 +22,12 @@ export default async function ParentDashboard() {
   }
 
   if (!dbUser || dbUser.role !== 'PARENT') {
-    redirect('/login');
+    // If user doesn't have PARENT role, redirect to their actual dashboard
+    if (dbUser) {
+      redirect(`/${dbUser.role.toLowerCase()}`);
+    } else {
+      redirect('/login');
+    }
   }
 
   // Fetch parent details

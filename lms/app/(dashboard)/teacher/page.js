@@ -22,7 +22,12 @@ export default async function TeacherDashboard() {
   }
 
   if (!dbUser || dbUser.role !== 'TEACHER') {
-    redirect('/login');
+    // If user doesn't have TEACHER role, redirect to their actual dashboard
+    if (dbUser) {
+      redirect(`/${dbUser.role.toLowerCase()}`);
+    } else {
+      redirect('/login');
+    }
   }
 
   // Fetch teacher profile details

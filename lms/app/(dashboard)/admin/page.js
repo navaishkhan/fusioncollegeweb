@@ -22,7 +22,12 @@ export default async function AdminDashboard() {
   }
 
   if (!dbUser || dbUser.role !== 'ADMIN') {
-    redirect('/login');
+    // If user doesn't have ADMIN role, redirect to their actual dashboard
+    if (dbUser) {
+      redirect(`/${dbUser.role.toLowerCase()}`);
+    } else {
+      redirect('/login');
+    }
   }
 
   // Fetch admin profile

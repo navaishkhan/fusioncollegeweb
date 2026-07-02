@@ -275,13 +275,26 @@ npm run dev
 ## User Management
 
 ### Creating Users
-All users are managed through Supabase Authentication. The workflow:
+All users are managed through Supabase Authentication. The system automatically creates database profiles when users first log in.
 
+**Simple Workflow:**
 1. **Create user in Supabase Dashboard**: Go to Supabase Dashboard > Authentication > Users and create users with their email and password
-2. **Create database profile**: After creating a user in Supabase, use the seed script to create the corresponding database profile
+2. **Set user role**: In Supabase Dashboard, set the user's role in their metadata (`role` field: ADMIN, TEACHER, STUDENT, or PARENT)
+3. **User logs in**: The system automatically creates the corresponding database profile on first login
 
-### Creating Admin Profile
-1. Create a user in Supabase Dashboard with admin credentials
+**No seed script required** for regular user creation!
+
+### Setting User Roles in Supabase
+When creating a user in Supabase Dashboard, set the user metadata:
+- Key: `role`
+- Value: `ADMIN`, `TEACHER`, `STUDENT`, or `PARENT`
+
+The system will automatically create the appropriate profile (Admin, Teacher, Student, or Parent) when they first log in.
+
+### Using the Seed Script (Optional)
+The seed script is only needed if you want to pre-populate the database with specific users without them logging in first. To use it:
+
+1. Create a user in Supabase Dashboard
 2. Copy the user ID from Supabase Dashboard
 3. Update `prisma/seed.js` with the user ID, email, and name
 4. Run the seed script:
@@ -289,11 +302,13 @@ All users are managed through Supabase Authentication. The workflow:
 npm run seed
 ```
 
-### Creating Other User Profiles
-For teachers, students, and parents, you can either:
-- Use the API routes to create profiles after Supabase user creation
-- Manually insert records in the database
-- Create a custom seed script for bulk user creation
+### Automatic Profile Creation
+When a user logs in for the first time:
+- The system checks if a database profile exists
+- If not, it automatically creates:
+  - A `User` record with their email and role from Supabase metadata
+  - A role-specific profile (Admin, Teacher, Student, or Parent) with default values
+- For students, a temporary roll number is generated (can be updated later)
 
 ## Common Tasks
 

@@ -22,7 +22,12 @@ export default async function StudentDashboard() {
   }
 
   if (!dbUser || dbUser.role !== 'STUDENT') {
-    redirect('/login');
+    // If user doesn't have STUDENT role, redirect to their actual dashboard
+    if (dbUser) {
+      redirect(`/${dbUser.role.toLowerCase()}`);
+    } else {
+      redirect('/login');
+    }
   }
 
   // Fetch student profile details from db
