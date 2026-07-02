@@ -13,15 +13,20 @@ export default async function Home() {
     redirect('/login');
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: {
-      authId: user.id,
-    },
-  });
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        authId: user.id,
+      },
+    });
 
-  if (!dbUser) {
+    if (!dbUser) {
+      redirect('/login');
+    }
+
+    redirect(`/${dbUser.role.toLowerCase()}`);
+  } catch (error) {
+    console.error('Error fetching user:', error);
     redirect('/login');
   }
-
-  redirect(`/${dbUser.role.toLowerCase()}`);
 }
