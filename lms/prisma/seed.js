@@ -9,16 +9,18 @@ const prisma = new PrismaClient();
 /* ---------------------------------------------------
    UPDATE THESE VALUES BEFORE RUNNING THE SCRIPT
    --------------------------------------------------- */
-const ADMIN_USER_ID = "00249e96-8b8a-4200-addb-6f71cc9c572b"; // Supabase "auth.users.id"
-const ADMIN_EMAIL = "navaishkhan55@gmail.com";
-const ADMIN_NAME = "Fusion College Admin";
+const ADMIN_USER_ID = "YOUR_SUPABASE_USER_ID"; // Supabase "auth.users.id"
+const ADMIN_EMAIL = "your@email.com";
+const ADMIN_NAME = "Your Name";
 /* --------------------------------------------------- */
 
 async function main() {
-  // Ensure a User row exists (supabase auth webhook should have created it,
-  // but we upsert just in case)
+  // This script creates a database profile for an existing Supabase user
+  // Users should be created in Supabase Dashboard first, then use this script
+  // to create the corresponding database profile
+
   await prisma.user.upsert({
-    where: { id: ADMIN_USER_ID },
+    where: { authId: ADMIN_USER_ID },
     update: { email: ADMIN_EMAIL, role: "ADMIN" },
     create: {
       id: ADMIN_USER_ID,
@@ -34,13 +36,15 @@ async function main() {
     where: { userId: ADMIN_USER_ID },
     update: { name: ADMIN_NAME },
     create: {
-      id: crypto.randomUUID(),
+      id: ADMIN_USER_ID,
       userId: ADMIN_USER_ID,
       name: ADMIN_NAME,
     },
   });
 
-  console.log("✅ Default admin record created/updated");
+  console.log("✅ Admin database profile created/updated");
+  console.log("User ID:", ADMIN_USER_ID);
+  console.log("Email:", ADMIN_EMAIL);
 }
 
 main()
