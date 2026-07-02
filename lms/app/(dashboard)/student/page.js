@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import prisma from '@/utils/db';
+import Link from 'next/link';
 
 export default async function StudentDashboard() {
   const supabase = await createClient();
@@ -138,6 +139,25 @@ export default async function StudentDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="space-y-6">
+        <h2 className="text-lg font-bold text-white tracking-tight">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Link href="/student/courses" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
+            My Courses
+          </Link>
+          <Link href="/student/assignments" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
+            My Assignments
+          </Link>
+          <Link href="/student/grades" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
+            My Grades
+          </Link>
+          <Link href="/student/attendance" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
+            My Attendance
+          </Link>
         </div>
       </div>
     </div>

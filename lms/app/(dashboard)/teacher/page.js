@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import prisma from '@/utils/db';
+import Link from 'next/link';
 
 export default async function TeacherDashboard() {
   const supabase = await createClient();
@@ -136,6 +137,19 @@ export default async function TeacherDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="space-y-6">
+        <h2 className="text-lg font-bold text-white tracking-tight">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link href="/teacher/classes" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
+            View My Classes
+          </Link>
+          <Link href="/teacher/assignments" className="px-4 py-3 bg-[#0d0f1a] border border-[#1e233d] rounded-lg text-sm font-medium text-white hover:bg-[#1e233d] transition-colors text-center">
+            Manage Assignments
+          </Link>
         </div>
       </div>
     </div>
