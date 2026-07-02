@@ -118,10 +118,6 @@ export default async function TeacherAttendancePage({ params }) {
             <button className="w-full py-3 bg-cyan-600 hover:bg-cyan-700 border border-cyan-500 rounded-lg text-sm font-bold text-white transition-colors cursor-pointer">
               Submit Attendance
             </button>
-
-            <button className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 border border-emerald-500 rounded-lg text-sm font-bold text-white transition-colors cursor-pointer">
-              Send WhatsApp Notifications (Absent Only)
-            </button>
           </div>
 
           {/* Instructions */}
