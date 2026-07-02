@@ -4,18 +4,18 @@
 
 import { PrismaClient } from "@prisma/client";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+async function main() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error("Supabase URL or Service Key not set in env");
-  process.exit(1);
-}
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error("Supabase URL or Service Key not set in env");
+    process.exit(1);
+  }
 
-const ADMIN_EMAIL = "admin@fusioncollege.com";
-const ADMIN_PASSWORD = "AdminPass123!";
+  const ADMIN_EMAIL = "admin@fusioncollege.com";
+  const ADMIN_PASSWORD = "AdminPass123!";
 
-async function createSupabaseUser() {
   const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
     method: "POST",
     headers: {
@@ -34,16 +34,33 @@ async function createSupabaseUser() {
     const err = await response.text();
     throw new Error(`Supabase createUser failed: ${response.status} ${err}`);
   }
+
   const data = await response.json();
+  const supaUser = data;
+
+  const prisma = new PrismaClient();
+
+  try {
+    // Create User record in database
+    await prisma.user.upsert({
+      where: { authId: supaUser.id },
+      update: { email: ADMIN_EMAIL, role: "ADMIN" },
+      create: {
+        id: supaUser.id,
+        authId: supaUser.id,
+        email: ADMIN_EMAIL,
+        role: "ADMIN",
+        status: "ACTIVE",
       },
     });
     // Create Admin record linked to User
-    await prisma.admin.create({
-      data: {
+    await prisma.admin.upsert({
+      where: { userId: supaUser.id },
+      update: { name: "Default Admin" },
+      create: {
         id: supaUser.id,
         userId: supaUser.id,
         name: "Default Admin",
-        email: ADMIN_EMAIL,
       },
     });
     console.log("✅ Default admin created\nID:", supaUser.id, "\nPassword:", ADMIN_PASSWORD);

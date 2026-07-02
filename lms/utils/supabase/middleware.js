@@ -1,5 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function updateSession(request) {
   let supabaseResponse = NextResponse.next({
@@ -46,8 +49,18 @@ export async function updateSession(request) {
       return NextResponse.redirect(url);
     }
 
-    // Role-based route guard
-    const userRole = user.user_metadata?.role?.toLowerCase() || 'student';
+    // Role-based route guard - fetch role from database
+    let userRole = 'student';
+    try {
+      const dbUser = await prisma.user.findUnique({
+        where: { authId: user.id },
+        select: { role: true },
+      });
+      userRole = dbUser?.role?.toLowerCase() || 'student';
+    } catch (err) {
+      console.error('Error fetching user role:', err);
+    }
+
     // e.g. If user role is STUDENT, they should not access /admin or /teacher
     const isAuthorized = path.startsWith(`/${userRole}`);
     if (!isAuthorized) {
@@ -59,7 +72,16 @@ export async function updateSession(request) {
 
   // Redirect authenticated users away from the login page
   if (path === '/login' && user) {
-    const userRole = user.user_metadata?.role?.toLowerCase() || 'student';
+    let userRole = 'student';
+    try {
+      const dbUser = await prisma.user.findUnique({
+        where: { authId: user.id },
+        select: { role: true },
+      });
+      userRole = dbUser?.role?.toLowerCase() || 'student';
+    } catch (err) {
+      console.error('Error fetching user role:', err);
+    }
     const url = request.nextUrl.clone();
     url.pathname = `/${userRole}`;
     return NextResponse.redirect(url);
