@@ -10,6 +10,21 @@ export default async function TeacherDashboard() {
     redirect('/login');
   }
 
+  // Verify user has TEACHER role
+  let dbUser = null;
+  try {
+    dbUser = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { role: true },
+    });
+  } catch (err) {
+    console.error('Error fetching user role:', err);
+  }
+
+  if (!dbUser || dbUser.role !== 'TEACHER') {
+    redirect('/login');
+  }
+
   // Fetch teacher profile details
   let teacher = null;
   try {

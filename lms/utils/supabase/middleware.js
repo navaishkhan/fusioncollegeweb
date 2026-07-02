@@ -1,8 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export async function updateSession(request) {
   let supabaseResponse = NextResponse.next({
@@ -38,7 +35,7 @@ export async function updateSession(request) {
 
   const path = request.nextUrl.pathname;
 
-  // Protect portal routes
+  // Protect portal routes - only check if user is authenticated
   const protectedRoutes = ['/admin', '/teacher', '/student', '/parent'];
   const isProtected = protectedRoutes.some(route => path.startsWith(route));
 
@@ -48,42 +45,13 @@ export async function updateSession(request) {
       url.pathname = '/login';
       return NextResponse.redirect(url);
     }
-
-    // Role-based route guard - fetch role from database
-    let userRole = 'student';
-    try {
-      const dbUser = await prisma.user.findUnique({
-        where: { authId: user.id },
-        select: { role: true },
-      });
-      userRole = dbUser?.role?.toLowerCase() || 'student';
-    } catch (err) {
-      console.error('Error fetching user role:', err);
-    }
-
-    // e.g. If user role is STUDENT, they should not access /admin or /teacher
-    const isAuthorized = path.startsWith(`/${userRole}`);
-    if (!isAuthorized) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/${userRole}`;
-      return NextResponse.redirect(url);
-    }
   }
 
   // Redirect authenticated users away from the login page
+  // Role-based routing will be handled by the dashboard pages
   if (path === '/login' && user) {
-    let userRole = 'student';
-    try {
-      const dbUser = await prisma.user.findUnique({
-        where: { authId: user.id },
-        select: { role: true },
-      });
-      userRole = dbUser?.role?.toLowerCase() || 'student';
-    } catch (err) {
-      console.error('Error fetching user role:', err);
-    }
     const url = request.nextUrl.clone();
-    url.pathname = `/${userRole}`;
+    url.pathname = '/';
     return NextResponse.redirect(url);
   }
 

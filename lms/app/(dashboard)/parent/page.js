@@ -10,6 +10,21 @@ export default async function ParentDashboard() {
     redirect('/login');
   }
 
+  // Verify user has PARENT role
+  let dbUser = null;
+  try {
+    dbUser = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { role: true },
+    });
+  } catch (err) {
+    console.error('Error fetching user role:', err);
+  }
+
+  if (!dbUser || dbUser.role !== 'PARENT') {
+    redirect('/login');
+  }
+
   // Fetch parent details
   let parent = null;
   try {

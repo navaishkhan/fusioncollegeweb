@@ -10,6 +10,21 @@ export default async function AdminDashboard() {
     redirect('/login');
   }
 
+  // Verify user has ADMIN role
+  let dbUser = null;
+  try {
+    dbUser = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { role: true },
+    });
+  } catch (err) {
+    console.error('Error fetching user role:', err);
+  }
+
+  if (!dbUser || dbUser.role !== 'ADMIN') {
+    redirect('/login');
+  }
+
   // Fetch admin profile
   let admin = null;
   let enquiries = [];

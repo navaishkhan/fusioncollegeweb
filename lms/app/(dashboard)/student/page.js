@@ -10,6 +10,21 @@ export default async function StudentDashboard() {
     redirect('/login');
   }
 
+  // Verify user has STUDENT role
+  let dbUser = null;
+  try {
+    dbUser = await prisma.user.findUnique({
+      where: { authId: user.id },
+      select: { role: true },
+    });
+  } catch (err) {
+    console.error('Error fetching user role:', err);
+  }
+
+  if (!dbUser || dbUser.role !== 'STUDENT') {
+    redirect('/login');
+  }
+
   // Fetch student profile details from db
   let student = null;
   try {
